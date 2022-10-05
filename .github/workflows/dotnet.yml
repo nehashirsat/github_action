@@ -19,12 +19,10 @@ jobs:
         dotnet-version: 6.0.x
     - name: AWS CLI
       run: dotnet tool install -g Amazon.Lambda.Tools
-    - name: Publish prod
+    - name: Build
       run: cd hello-world-api; dotnet restore; dotnet publish -r win10-x64 --configuration "Release" --self-contained "true" -o ../site;
     - name: Generate deployment package 
       run: cd site; zip ../site.zip *; pwd; ls;
-    - name: Test
-      run: ls;
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
