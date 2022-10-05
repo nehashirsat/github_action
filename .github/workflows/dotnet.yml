@@ -28,9 +28,9 @@ jobs:
     - name: AWS CLI
       run: dotnet tool install -g Amazon.Lambda.Tools
     - name: Restore dependencies
-      run: dotnet restore Services.sln
+      run: dotnet restore dotnet-hello-world.sln
     - name: Build
-      run: dotnet build --no-restore Services.sln
+      run: dotnet build --no-restore dotnet-hello-world.sln
     - name: Deploy to Lambda
-      working-directory: ./Services/ApiServices
+      working-directory: ./hello-world-api/ApiServices
       run: dotnet lambda deploy-serverless
