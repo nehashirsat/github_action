@@ -22,11 +22,20 @@ jobs:
         dotnet-version: 6.0.x
     - name: AWS CLI
       run: dotnet tool install -g Amazon.Lambda.Tools
-    - name: Restore dependencies
-      run: dotnet restore
-    - name: Build
-      run: dotnet build --no-restore
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
-    - name: Deploy to Lambda
-      run: dotnet lambda deploy-serverless --region us-east-1
+    - name: Publish prod
+      run: cd hello-world-api; dotnet restore; dotnet publish -r win10-x64 --configuration "Release" --self-contained "true" -o ../site;
+    - name: Generate deployment package 
+      run: cd site; zip ../site.zip *;
+    - name: default deploy
+      uses: appleboy/lambda-action@master
+      with:
+        aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws_region: ${{ secrets.AWS_REGION }}
+        function_name: test
+        zip_file: site/site.zip
+        memory_size: 128
+        timeout: 10
+        handler: foobar
+        role: arn:aws:iam::543216510827:role/service-role/neha-lambda-role-k2czfh0z
+        runtime: .NET 6
