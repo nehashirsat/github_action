@@ -10,9 +10,6 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-    env: 
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
     steps:
     - uses: actions/checkout@v3
@@ -26,16 +23,12 @@ jobs:
       run: cd hello-world-api; dotnet restore; dotnet publish -r win10-x64 --configuration "Release" --self-contained "true" -o ../site;
     - name: Generate deployment package 
       run: cd site; zip ../site.zip *;
-    - name: default deploy
-      uses: appleboy/lambda-action@master
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
       with:
-        aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws_region: ${{ secrets.AWS_REGION }}
-        function_name: test
-        zip_file: site/site.zip
-        memory_size: 128
-        timeout: 10
-        handler: foobar
-        role: arn:aws:iam::543216510827:role/service-role/neha-lambda-role-k2czfh0z
-        runtime: .NET 6
+    - name: AWS Deploy
+      run: |
+          aws lambda update-function-code --function-name NameOfLambdaFunction --zip-file ../site/site.zip
