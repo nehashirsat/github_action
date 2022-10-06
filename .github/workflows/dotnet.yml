@@ -12,12 +12,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name : Chcekout
     - uses: actions/checkout@v3
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 6.0.x
-    - name: AWS CLI
+    - name: Install AWS CLI
       run: dotnet tool install -g Amazon.Lambda.Tools
     - name: Build
       run: cd hello-world-api; dotnet restore; dotnet publish -r win10-x64 --configuration "Release" --self-contained "true" -o ../site;
@@ -29,6 +30,6 @@ jobs:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_REGION }}
-    - name: AWS Deploy
+    - name: Deploy to AWS lambda
       run: |
           aws lambda update-function-code --function-name test --zip-file fileb://site.zip
